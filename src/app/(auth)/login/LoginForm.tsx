@@ -1,13 +1,18 @@
 'use client'
 
+import { LoginSchema, loginSchema } from "@/lib/schemas/loginSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardBody, CardHeader, Input } from "@nextui-org/react"
 import { useForm } from "react-hook-form";
 import { GiPadlock } from "react-icons/gi"
 
 export default function LoginForm() {
-    const {register,handleSubmit, formState: {errors, isValid}} = useForm();
+    const {register,handleSubmit, formState: {errors, isValid}} = useForm<LoginSchema>({
+        resolver: zodResolver(loginSchema),
+        mode: 'onTouched'
+    });
 
-    const onSubmit = (data: any) => console.log(data);
+    const onSubmit = (data: LoginSchema) => console.log(data);
     return (
         <Card className='w-2/5 mx-auto'>
             <CardHeader className='flex flex-col items-center justify-center'>
@@ -26,18 +31,18 @@ export default function LoginForm() {
                             defaultValue=''
                             label='Email'
                             variant='bordered'
-                            {...register("Email",{required: 'Email is required'})}
-                            isInvalid={!!errors.Email}
-                            errorMessage={errors.Email?.message as string}
+                            {...register("email")}
+                            isInvalid={!!errors.email}
+                            errorMessage={errors.email?.message}
                         />
                         <Input
                             defaultValue=''
-                            label='Password'
+                            label='password'
                             variant='bordered'
                             type='password'
-                            {...register("Password",{required: 'Password is required'})}
-                            isInvalid={!!errors.Password}
-                            errorMessage={errors.Password?.message as string}
+                            {...register("password")}
+                            isInvalid={!!errors.password}
+                            errorMessage={errors.password?.message}
                         />
                         <Button isDisabled={!isValid} fullWidth color='secondary' type='submit'>
                             Login
