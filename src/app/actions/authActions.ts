@@ -2,10 +2,12 @@
 
 import { prisma } from '@/lib/prisma';
 import {RegisterSchema, registerSchema} from '@/lib/schemas/registerSchema'
+import { ActionResult } from '@/type';
+import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs'
 
-export async function registerUser(data: RegisterSchema) {
-    
+export async function registerUser(data: RegisterSchema):Promise<ActionResult<User>> {
+    try {
     //validate data on server side
     const validated = registerSchema.safeParse(data);
 
@@ -15,7 +17,7 @@ export async function registerUser(data: RegisterSchema) {
     //  - data or error: Depending on the outcome, it either contains the validated data or the validation errors.
 
     if(!validated.success) {
-        return {error: validated.error.errors}
+        return {status: 'error', error: validated.error.errors}
     }
 
     //destructurare obiect data
@@ -26,17 +28,22 @@ export async function registerUser(data: RegisterSchema) {
         where: {email}    //email: email dar coloana are acelasi nume si merge direct
     })
 
-    if (existingUser) return { error: ('User already exist')}
+    if (existingUser) return {status: 'error', error: ('User already exist')}
 
     //incepem procedura de inregistrare prin hashing the password
 
     const passwordHash= await bcrypt.hash(password,10);
 
-    return prisma.user.create({
+    const user= await prisma.user.create({
         data: {
             name,
             email,
             passwordHash,            
         }
     })
+    return {status:'success', data: user}
+    } catch (error) {
+        console.log(error);
+        return {status: 'error', error: 'Something went wrong'}
+    }   
 }
