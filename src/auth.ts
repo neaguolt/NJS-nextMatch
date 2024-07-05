@@ -6,9 +6,9 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./lib/prisma"
 
 //we are in dev env so this will create multiple instances of conections
-//const prisma = new PrismaClient()
+//const prisma = new PrismaClient() so we import prisma from lib/prisma
 
-export const { handlers, auth } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     ...authConfig,
